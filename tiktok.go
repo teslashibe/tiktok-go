@@ -45,6 +45,8 @@ type Client struct {
 	gapMu      sync.Mutex
 	lastReqAt  time.Time
 	msMu       sync.Mutex // protects msToken rotation
+	rlMu       sync.Mutex
+	rlState    RateLimitState
 }
 
 // Option configures a Client.
@@ -85,6 +87,14 @@ func New(cookies Cookies, opts ...Option) (*Client, error) {
 		o(c)
 	}
 	return c, nil
+}
+
+// RateLimit returns a snapshot of the most recently observed rate-limit state.
+// Use RateLimitState.IsLimited() to check if the client is currently throttled.
+func (c *Client) RateLimit() RateLimitState {
+	c.rlMu.Lock()
+	defer c.rlMu.Unlock()
+	return c.rlState
 }
 
 // buildCookieHeader constructs the Cookie header value from the Cookies struct.
