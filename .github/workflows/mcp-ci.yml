@@ -1,0 +1,37 @@
+name: MCP CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mcp/**"
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/mcp-ci.yml"
+  pull_request:
+    paths:
+      - "mcp/**"
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/mcp-ci.yml"
+
+jobs:
+  mcp:
+    name: mcp package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+      - name: Tidy check
+        run: |
+          go mod tidy
+          git diff --exit-code go.mod go.sum
+      - name: Vet
+        run: go vet ./...
+      - name: Build
+        run: go build ./...
+      - name: Test mcp package
+        run: go test -race -count=1 ./mcp/...

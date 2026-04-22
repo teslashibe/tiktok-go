@@ -194,6 +194,27 @@ client, _ := tiktok.New(cookies,
 )
 ```
 
+## MCP support
+
+This package ships an [MCP](https://modelcontextprotocol.io/) tool surface in `./mcp` for use with [`teslashibe/mcptool`](https://github.com/teslashibe/mcptool)-compatible hosts (e.g. [`teslashibe/agent-setup`](https://github.com/teslashibe/agent-setup)). 28 tools cover the full client API: profile fetch, user videos / liked / saved / followers / following, video detail, search (videos / users / live), hashtag detail + videos, feeds (FYP / following / trending), comments (list / replies / post / reply / delete / like), and social actions (like, follow, collect, repost, delete repost, block, mute).
+
+```go
+import (
+    "github.com/teslashibe/mcptool"
+    tiktok "github.com/teslashibe/tiktok-go"
+    ttmcp "github.com/teslashibe/tiktok-go/mcp"
+)
+
+client, _ := tiktok.New(tiktok.Cookies{...})
+provider := ttmcp.Provider{}
+for _, tool := range provider.Tools() {
+    // register tool with your MCP server, passing client as the
+    // opaque client argument when invoking
+}
+```
+
+A coverage test in `mcp/mcp_test.go` fails if a new exported method is added to `*Client` without either being wrapped by an MCP tool or being added to `mcp.Excluded` with a reason — keeping the MCP surface in lockstep with the package API is enforced by CI rather than convention.
+
 ## Integration Tests
 
 ```bash
