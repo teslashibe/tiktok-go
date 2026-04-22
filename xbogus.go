@@ -81,5 +81,3 @@ func encodeXBogus(data []byte) string {
 	return string(result)
 }
 
-// CalcXBogusExported is exported for testing only.
-var CalcXBogusExported = calcXBogus
